@@ -1,6 +1,7 @@
 package cms.tuitionclass.service.configuration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -27,7 +28,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     return configuration;
                 }).and()
                 .authorizeRequests(
-                        authorize -> authorize.anyRequest().authenticated()
+                        authorize -> {
+                            authorize.antMatchers(HttpMethod.GET,"api/v1/tuition").permitAll()
+                                    .anyRequest().authenticated();}
+
                 ).formLogin().and()
                 .httpBasic();
     }

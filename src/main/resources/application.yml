@@ -6,6 +6,13 @@ spring:
   application:
     name: CMS-Class-Location
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: https://cms-discovery.herokuapp.com/eureka
+  instance:
+    preferIpAddress: true
+
   datasource:
     url: jdbc:mysql://ba357867db0b80:d43777ed@us-cdbr-east-06.cleardb.net/heroku_93837273fed35d1?reconnect=true
 #    username: root

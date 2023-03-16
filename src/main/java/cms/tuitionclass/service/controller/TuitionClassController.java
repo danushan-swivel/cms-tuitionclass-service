@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("api/v1/tuition/")
+@RequestMapping("api/v1/tuition")
 @RestController
 public class TuitionClassController {
     private final TuitionClassService tuitionClassService;
@@ -55,7 +55,7 @@ public class TuitionClassController {
         }
     }
 
-    @GetMapping("/{locationId}")
+    @GetMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> getTuitionClassById(@PathVariable String tuitionClassId) {
         try {
             if (tuitionClassId.trim().isEmpty() || tuitionClassId == null) {
@@ -95,7 +95,7 @@ public class TuitionClassController {
         }
     }
 
-    @DeleteMapping("/{locationId}")
+    @DeleteMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> deleteTuitionClass(@PathVariable String tuitionClassId) {
         try {
             if (tuitionClassId.trim().isEmpty() || tuitionClassId == null) {

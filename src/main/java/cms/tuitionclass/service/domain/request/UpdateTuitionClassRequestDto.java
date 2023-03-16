@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public class UpdateTuitionClassRequestDto extends RequestDto{
     private String tuitionClassId;
+    private String locationName;
     private String address;
     private String district;
     private String province;

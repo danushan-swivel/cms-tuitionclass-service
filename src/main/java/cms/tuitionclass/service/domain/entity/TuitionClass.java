@@ -44,6 +44,7 @@ public class TuitionClass {
     public void update(UpdateTuitionClassRequestDto updateLocationRequestDto) {
         this.address = updateLocationRequestDto.getAddress();
         this.district = updateLocationRequestDto.getDistrict();
+        this.locationName = updateLocationRequestDto.getLocationName();
         this.province = updateLocationRequestDto.getProvince();
         this.updatedAt = new Date(System.currentTimeMillis());
         this.isDeleted = false;

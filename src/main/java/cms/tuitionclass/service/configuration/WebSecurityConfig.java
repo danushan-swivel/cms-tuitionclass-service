@@ -1,29 +1,32 @@
 package cms.tuitionclass.service.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-
-import java.util.Collections;
 
 @EnableWebSecurity
 @Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+public class WebSecurityConfig {
+    private final String key;
+
+    public WebSecurityConfig(@Value("${security.key}") String key) {
+        this.key = key;
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.addFilterBefore(new JwtValidator(key), BasicAuthenticationFilter.class)
+                .csrf().disable()
                 .authorizeRequests(
                         authorize -> {
-                            authorize.antMatchers(HttpMethod.GET, "api/v1/tuition").permitAll()
-                                    .anyRequest().authenticated();
+                            authorize.anyRequest().authenticated();
                         }
-
                 ).formLogin().and()
                 .httpBasic();
+        return http.build();
     }
 }

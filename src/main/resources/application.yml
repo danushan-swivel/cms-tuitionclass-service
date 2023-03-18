@@ -1,6 +1,8 @@
 
 server:
   port: 8105
+  servlet:
+    context-path: /tuition
 
 spring:
   application:
@@ -23,4 +25,8 @@ eureka:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
+
+security:
+  key: accessKey
+
 

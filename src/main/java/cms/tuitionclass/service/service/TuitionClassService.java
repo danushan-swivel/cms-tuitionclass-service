@@ -18,7 +18,7 @@ import java.sql.Date;
 @Service
 public class TuitionClassService {
     private static final int PAGE = 0;
-    private static final int SIZE = 10;
+    private static final int SIZE = 100;
     private static final String DEFAULT_SORT = "updated_at";
     private final TuitionClassRepository tuitionClassRepository;
 

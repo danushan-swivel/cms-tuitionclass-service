@@ -1,7 +1,9 @@
 package cms.tuitionclass.service.domain.request;
 
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class UpdateTuitionClassRequestDto extends RequestDto{
     private String tuitionClassId;
@@ -12,6 +14,6 @@ public class UpdateTuitionClassRequestDto extends RequestDto{
 
     @Override
     public boolean isRequiredAvailable() {
-        return isNonEmpty(tuitionClassId) && isNonEmpty(address) && isNonEmpty(district) && isNonEmpty(province);
+        return isNonEmpty(tuitionClassId) && isNonEmpty(address) && isNonEmpty(district) && isNonEmpty(province)  && isNonEmpty(locationName);
     }
 }

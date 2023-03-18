@@ -32,7 +32,7 @@ public class JwtValidator extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwtToken = request.getHeader(Constants.TOKEN_HEADER);
         if (jwtToken != null) {
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(Constants.SECRET_KEY.getBytes())).build();
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(key)).build();
             DecodedJWT decodedJWT = jwtVerifier.verify(jwtToken);
             String userName = decodedJWT.getClaim("username").toString();
             var roles = decodedJWT.getClaim("authorities").asList(String.class);

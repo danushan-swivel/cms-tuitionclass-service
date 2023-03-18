@@ -14,7 +14,7 @@ eureka:
     preferIpAddress: true
 
   datasource:
-    url: jdbc:mysql://ba357867db0b80:d43777ed@us-cdbr-east-06.cleardb.net/heroku_93837273fed35d1?reconnect=true
+    url: jdbc:mysql://bd3dabe003b1d4:d3f6ae8c@us-cdbr-east-06.cleardb.net/heroku_b2917d10e1448b0?reconnect=true
 #    username: root
 #    password: Dev@#$123
     driver-class-name: com.mysql.cj.jdbc.Driver

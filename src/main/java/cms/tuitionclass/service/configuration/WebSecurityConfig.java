@@ -22,9 +22,7 @@ public class WebSecurityConfig {
         http.addFilterBefore(new JwtValidator(key), BasicAuthenticationFilter.class)
                 .csrf().disable()
                 .authorizeRequests(
-                        authorize -> {
-                            authorize.anyRequest().authenticated();
-                        }
+                        authorize -> authorize.anyRequest().authenticated()
                 ).formLogin().and()
                 .httpBasic();
         return http.build();

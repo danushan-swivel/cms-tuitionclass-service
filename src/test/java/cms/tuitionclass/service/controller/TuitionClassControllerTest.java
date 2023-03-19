@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TuitionClassControllerTest {
 
     private static final String TUITION_CLASS_BASE_URL = "/api/v1/tuition/";
-    private static final String DELETE_STUDENT_URL = "/api/v1/tuition/##TUITION-CLASS-ID##";
+    private static final String TUITION_CLASS_BY_ID_URL = "/api/v1/tuition/##TUITION-CLASS-ID##";
     private static final String REPLACE_TUITION_CLASS_ID = "##TUITION-CLASS-ID##";
 
     private static final String TUITION_CLASS_ID = "tid-1256-9541-8523-7536";
@@ -140,6 +140,21 @@ class TuitionClassControllerTest {
     }
 
     @Test
+    void Should_ReturnBadRequest_When_InvalidTuitionClassIdIsProvidedForUpdateTuitionClass() throws Exception {
+        UpdateTuitionClassRequestDto updateTuitionClassRequestDto = getSampleUpdateTuitionClassRequestDto();
+        doThrow(new InvalidTuitionClassException("ERROR")).when(tuitionClassService).updateTuitionClass(any(UpdateTuitionClassRequestDto.class));
+        mockMvc.perform(MockMvcRequestBuilders.put(TUITION_CLASS_BASE_URL)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .content(updateTuitionClassRequestDto.toJson())
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
     void Should_ReturnInternalServerError_When_UpdateTuitionClassIsFailed() throws Exception {
         UpdateTuitionClassRequestDto updateTuitionClassRequestDto = getSampleUpdateTuitionClassRequestDto();
         doThrow(new TuitionClassException("ERROR")).when(tuitionClassService).updateTuitionClass(any(UpdateTuitionClassRequestDto.class));
@@ -183,9 +198,52 @@ class TuitionClassControllerTest {
     }
 
     @Test
+    void Should_ReturnOk_When_GetTuitionClassSuccessfully() throws Exception {
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        TuitionClass tuitionClass = getSampleTuitionClass();
+        when(tuitionClassService.getTuitionClassById(TUITION_CLASS_ID)).thenReturn(tuitionClass);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(SuccessResponseStatus.READ_LOCATION.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(SuccessResponseStatus.READ_LOCATION.getStatusCode()))
+                .andExpect(jsonPath("$.data.tuitionClassId", startsWith("tid-")));
+    }
+
+    @Test
+    void Should_ReturnBadRequest_When_InvalidTuitionClassIdIsProvided() throws Exception {
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        doThrow(new InvalidTuitionClassException("ERROR")).when(tuitionClassService).getTuitionClassById(TUITION_CLASS_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INVALID_LOCATION.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INVALID_LOCATION.getStatusCode()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
+    void Should_ReturnInternalServerError_When_GetTuitionClassIsFailed() throws Exception {
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        doThrow(new TuitionClassException("ERROR")).when(tuitionClassService).getTuitionClassById(TUITION_CLASS_ID);
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getMessage()))
+                .andExpect(jsonPath("$.statusCode").value(ErrorResponseStatus.INTERNAL_SERVER_ERROR.getStatusCode()))
+                .andExpect(jsonPath("$.data", nullValue()));
+    }
+
+    @Test
     void Should_ReturnOk_When_DeleteTuitionClassSuccessfully() throws Exception {
         doNothing().when(tuitionClassService).deleteLocation(TUITION_CLASS_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
@@ -199,7 +257,7 @@ class TuitionClassControllerTest {
     @Test
     void Should_ReturnInvalidTuitionClassException_When_InvalidTuitionClassIdIsProvided() throws Exception {
         doThrow(new InvalidTuitionClassException("ERROR")).when(tuitionClassService).deleteLocation(TUITION_CLASS_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
@@ -214,7 +272,7 @@ class TuitionClassControllerTest {
     void Should_ReturnInternalServerError_When_DeleteTuitionClassIsFailed() throws Exception {
         doThrow(new TuitionClassException("ERROR")).when(tuitionClassService)
                 .deleteLocation(TUITION_CLASS_ID);
-        String url = DELETE_STUDENT_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
+        String url = TUITION_CLASS_BY_ID_URL.replace(REPLACE_TUITION_CLASS_ID, TUITION_CLASS_ID);
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
                         .header(Constants.TOKEN_HEADER, ACCESS_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))

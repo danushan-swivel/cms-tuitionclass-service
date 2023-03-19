@@ -25,6 +25,12 @@ public class TuitionClassController {
         this.tuitionClassService = tuitionClassService;
     }
 
+    /**
+     * Create tuition class
+     *
+     * @param tuitionClassRequestDto tuition class request dto
+     * @return success/ error response
+     */
     @PostMapping("")
     public ResponseEntity<ResponseWrapper> createTuitionClass(@RequestBody TuitionClassRequestDto tuitionClassRequestDto) {
         try {
@@ -42,6 +48,11 @@ public class TuitionClassController {
         }
     }
 
+    /**
+     * Get all tuition class detail
+     *
+     * @return success/ error response
+     */
     @GetMapping("")
     public ResponseEntity<ResponseWrapper> getAllTuitionClasses() {
         try {
@@ -55,13 +66,15 @@ public class TuitionClassController {
         }
     }
 
+    /**
+     * Get tuition class by tuition class id
+     *
+     * @param tuitionClassId tuition class id
+     * @return success/ error response
+     */
     @GetMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> getTuitionClassById(@PathVariable String tuitionClassId) {
         try {
-            if (tuitionClassId.trim().isEmpty() || tuitionClassId == null) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
             var tuitionClass = tuitionClassService.getTuitionClassById(tuitionClassId);
             var responseDto = new TuitionClassResponseDto(tuitionClass);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_LOCATION, responseDto);
@@ -75,6 +88,12 @@ public class TuitionClassController {
         }
     }
 
+    /**
+     * Update existing tuition class
+     *
+     * @param updateLocationRequestDto update location request dto
+     * @return success/ error response
+     */
     @PutMapping("")
     public ResponseEntity<ResponseWrapper> updateTuitionClass(@RequestBody UpdateTuitionClassRequestDto updateLocationRequestDto) {
         try {
@@ -95,13 +114,15 @@ public class TuitionClassController {
         }
     }
 
+    /**
+     * Delete tuition class by tuition class id
+     *
+     * @param tuitionClassId tuition class id
+     * @return success/ error response
+     */
     @DeleteMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> deleteTuitionClass(@PathVariable String tuitionClassId) {
         try {
-            if (tuitionClassId.trim().isEmpty() || tuitionClassId == null) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
             tuitionClassService.deleteLocation(tuitionClassId);
             var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.LOCATION_DELETED, null);
             return new ResponseEntity<>(successResponse, HttpStatus.OK);

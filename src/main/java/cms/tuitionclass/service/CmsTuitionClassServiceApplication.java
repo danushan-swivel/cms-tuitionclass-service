@@ -6,10 +6,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class CmsTuitionclassServiceApplication {
+public class CmsTuitionClassServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CmsTuitionclassServiceApplication.class, args);
+		SpringApplication.run(CmsTuitionClassServiceApplication.class, args);
 	}
 
 }

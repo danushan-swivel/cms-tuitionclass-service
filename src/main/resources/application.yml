@@ -30,4 +30,11 @@ eureka:
 security:
   key: accessKey
 
+logging:
+  level:
+    cms.tuitionclass.service: ${LOG_LEVEL:DEBUG}
+  file:
+    path: ${LOGPATH:./log}
+
+
 

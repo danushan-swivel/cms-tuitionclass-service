@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -22,10 +23,15 @@ import java.util.UUID;
 public class TuitionClass {
     private static final String PREFIX ="tid-";
     @Id
+    @Column(length = 50)
     private String tuitionClassId;
+    @Column(length = 20)
     private String locationName;
+    @Column(length = 100)
     private String address;
+    @Column(length = 20)
     private String district;
+    @Column(length = 20)
     private String province;
     private Date createdAt;
     private Date updatedAt;

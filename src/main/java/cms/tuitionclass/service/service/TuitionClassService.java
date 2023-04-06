@@ -4,6 +4,7 @@ import cms.tuitionclass.service.domain.entity.TuitionClass;
 import cms.tuitionclass.service.domain.request.TuitionClassRequestDto;
 import cms.tuitionclass.service.domain.request.UpdateTuitionClassRequestDto;
 import cms.tuitionclass.service.exception.InvalidTuitionClassException;
+import cms.tuitionclass.service.exception.TuitionClassAlreadyExistsException;
 import cms.tuitionclass.service.exception.TuitionClassException;
 import cms.tuitionclass.service.repository.TuitionClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,9 @@ public class TuitionClassService {
      */
     public TuitionClass saveTuitionClass(TuitionClassRequestDto tuitionClassRequestDto) {
         try {
+            if (checkTuitionClassNameExists(tuitionClassRequestDto.getLocationName(), null)) {
+                throw new TuitionClassAlreadyExistsException("Tuition class name already exists in database");
+            }
             TuitionClass tuitionClass = new TuitionClass(tuitionClassRequestDto);
             return tuitionClassRepository.save(tuitionClass);
         } catch (DataAccessException e) {
@@ -86,6 +90,10 @@ public class TuitionClassService {
      */
     public TuitionClass updateTuitionClass(UpdateTuitionClassRequestDto updateTuitionClassRequestDto) {
         try {
+            if (checkTuitionClassNameExists(updateTuitionClassRequestDto.getLocationName(),
+                    updateTuitionClassRequestDto.getTuitionClassId())) {
+                throw new TuitionClassAlreadyExistsException("Tuition class name already exists in database");
+            }
             TuitionClass tuitionClass = getTuitionClassById(updateTuitionClassRequestDto.getTuitionClassId());
             tuitionClass.update(updateTuitionClassRequestDto);
             tuitionClassRepository.save(tuitionClass);
@@ -110,5 +118,19 @@ public class TuitionClassService {
         } catch (DataAccessException e) {
             throw new TuitionClassException("Deleting location from database is failed. Id: " + locationId, e);
         }
+    }
+
+    private boolean checkTuitionClassNameExists(String tuitionClassLocationName, String tuitionClassId) {
+        try {
+            if (tuitionClassId == null) {
+                return tuitionClassRepository.existsByLocationNameAndIsDeletedFalse(tuitionClassLocationName);
+            } else {
+                return tuitionClassRepository
+                        .existsByLocationNameAndTuitionClassIdNotAndIsDeletedFalse(tuitionClassLocationName, tuitionClassId);
+            }
+        } catch (DataAccessException e) {
+            throw new TuitionClassException("Checking existing tuition class location name is failed");
+        }
+
     }
 }

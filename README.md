@@ -1,6 +1,38 @@
-# cms-tuitionclass-service
-cms-tuitionclass-service
+## CMS Tuition Class Service
+This is tuition class microservice of the Class Management System
 
-#Sonar Report
+## Requirements
+* Open JDK 11
+* Spring boot 2.7.9
+* MySQL 8.0
+* Maven 3.6
 
-![yuition-sonar](https://user-images.githubusercontent.com/101617280/226343279-84700f65-5dda-42cb-80e8-279cf77d4dab.png)
+
+
+## Build
+
+```
+mvn clean compile package
+```
+
+## Run
+
+```
+mvn spring-boot:run
+```
+
+or
+
+```
+java -jar target/cms-tuitonclass-service-0.0.1-SNAPSHOT.jar
+```
+
+## Test
+
+```
+mvn test
+```
+
+## Sonar Dashboard
+```
+https://sonarcloud.io/project/overview?id=danushan-swivel_cms-tuitionclass-service```

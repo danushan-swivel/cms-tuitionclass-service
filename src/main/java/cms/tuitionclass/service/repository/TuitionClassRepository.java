@@ -16,4 +16,8 @@ public interface TuitionClassRepository extends JpaRepository<TuitionClass, Stri
 
     @Query(value = "SELECT * FROM tuition_class d WHERE d.is_deleted=false", nativeQuery = true)
     Page<TuitionClass> findAll(Pageable pageable);
+
+    boolean existsByLocationNameAndIsDeletedFalse(String locationName);
+
+    boolean existsByLocationNameAndTuitionClassIdNotAndIsDeletedFalse(String locationName, String tuitionClassId);
 }

@@ -1,7 +1,6 @@
 package cms.tuitionclass.service.domain.response;
 
 import cms.tuitionclass.service.domain.entity.TuitionClass;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,8 +8,7 @@ import java.sql.Date;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-public class TuitionClassResponseDto extends ResponseDto{
+public class TuitionClassResponseDto extends ResponseDto {
     private String tuitionClassId;
     private String locationName;
     private String address;

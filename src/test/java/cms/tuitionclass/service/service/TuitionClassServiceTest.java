@@ -4,6 +4,7 @@ import cms.tuitionclass.service.domain.entity.TuitionClass;
 import cms.tuitionclass.service.domain.request.TuitionClassRequestDto;
 import cms.tuitionclass.service.domain.request.UpdateTuitionClassRequestDto;
 import cms.tuitionclass.service.exception.InvalidTuitionClassException;
+import cms.tuitionclass.service.exception.TuitionClassAlreadyExistsException;
 import cms.tuitionclass.service.exception.TuitionClassException;
 import cms.tuitionclass.service.repository.TuitionClassRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -52,13 +53,34 @@ class TuitionClassServiceTest {
     void Should_ReturnTuitionClass_When_CreateTuitionClassSuccessfully() {
         TuitionClass tuitionClass = getSampleTuitionClass();
         TuitionClassRequestDto tuitionClassRequestDto = getSampleTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndIsDeletedFalse(LOCATION_NAME)).thenReturn(false);
         when(tuitionClassRepository.save(any(TuitionClass.class))).thenReturn(tuitionClass);
         assertEquals(tuitionClass, tuitionClassService.saveTuitionClass(tuitionClassRequestDto));
     }
 
     @Test
+    void Should_ThrowTuitionClassAlreadyExistsException_When_TuitionClassLocationNameAlreadyExistsForCreateNewTuitionClass() {
+        TuitionClassRequestDto tuitionClassRequestDto = getSampleTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndIsDeletedFalse(LOCATION_NAME)).thenReturn(true);
+        TuitionClassAlreadyExistsException exception = assertThrows(TuitionClassAlreadyExistsException.class, () ->
+                tuitionClassService.saveTuitionClass(tuitionClassRequestDto));
+        assertEquals("Tuition class name already exists in database", exception.getMessage());
+    }
+
+    @Test
+    void Should_ThrowTuitionClassException_When_CheckDuplicateTuitionClassNameIsFailed() {
+        TuitionClassRequestDto tuitionClassRequestDto = getSampleTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndIsDeletedFalse(LOCATION_NAME))
+                .thenThrow(new DataAccessException("ERROR") { });
+        TuitionClassException exception = assertThrows(TuitionClassException.class, () ->
+                tuitionClassService.saveTuitionClass(tuitionClassRequestDto));
+        assertEquals("Checking existing tuition class location name is failed", exception.getMessage());
+    }
+
+    @Test
     void Should_ThrowTuitionClassException_When_SaveTuitionCLassIsFailed() {
         TuitionClassRequestDto tuitionClassRequestDto = getSampleTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndIsDeletedFalse(LOCATION_NAME)).thenReturn(false);
         when(tuitionClassRepository.save(any(TuitionClass.class))).thenThrow(new DataAccessException("ERROR") {
         });
         TuitionClassException exception = assertThrows(TuitionClassException.class, () ->
@@ -71,14 +93,28 @@ class TuitionClassServiceTest {
         TuitionClass tuitionClass = getSampleTuitionClass();
         tuitionClass.setAddress(UPDATED_ADDRESS);
         UpdateTuitionClassRequestDto updateTuitionClassRequestDto = getSampleUpdateTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndTuitionClassIdNotAndIsDeletedFalse(LOCATION_NAME, TUITION_CLASS_ID))
+                .thenReturn(false);
         when(tuitionClassRepository.findByTuitionClassId(TUITION_CLASS_ID)).thenReturn(Optional.of(tuitionClass));
         when(tuitionClassRepository.save(tuitionClass)).thenReturn(tuitionClass);
         assertEquals(tuitionClass, tuitionClassService.updateTuitionClass(updateTuitionClassRequestDto));
     }
 
     @Test
+    void Should_ThrowTuitionClassAlreadyExistsException_When_TuitionClassLocationNameAlreadyExistsForUpdateTuitionClass() {
+        UpdateTuitionClassRequestDto updateTuitionClassRequestDto = getSampleUpdateTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndTuitionClassIdNotAndIsDeletedFalse(LOCATION_NAME, TUITION_CLASS_ID))
+                .thenReturn(true);
+        TuitionClassAlreadyExistsException exception = assertThrows(TuitionClassAlreadyExistsException.class, () ->
+                tuitionClassService.updateTuitionClass(updateTuitionClassRequestDto));
+        assertEquals("Tuition class name already exists in database", exception.getMessage());
+    }
+
+    @Test
     void Should_ThrowInvalidTuitionClassException_When_InvalidTuitionClassIdIsProvided() {
         UpdateTuitionClassRequestDto updateTuitionClassRequestDto = getSampleUpdateTuitionClassRequestDto();
+        when(tuitionClassRepository.existsByLocationNameAndTuitionClassIdNotAndIsDeletedFalse(LOCATION_NAME, TUITION_CLASS_ID))
+                .thenReturn(false);
         when(tuitionClassRepository.findByTuitionClassId(TUITION_CLASS_ID)).thenReturn(Optional.empty());
         InvalidTuitionClassException exception = assertThrows(InvalidTuitionClassException.class, () ->
                 tuitionClassService.updateTuitionClass(updateTuitionClassRequestDto));

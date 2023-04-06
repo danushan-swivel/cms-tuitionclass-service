@@ -6,19 +6,17 @@ import cms.tuitionclass.service.domain.response.TuitionClassListResponseDto;
 import cms.tuitionclass.service.domain.response.TuitionClassResponseDto;
 import cms.tuitionclass.service.enums.ErrorResponseStatus;
 import cms.tuitionclass.service.enums.SuccessResponseStatus;
-import cms.tuitionclass.service.exception.InvalidTuitionClassException;
-import cms.tuitionclass.service.exception.TuitionClassException;
 import cms.tuitionclass.service.service.TuitionClassService;
-import cms.tuitionclass.service.wrapper.ErrorResponseWrapper;
 import cms.tuitionclass.service.wrapper.ResponseWrapper;
-import cms.tuitionclass.service.wrapper.SuccessResponseWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RequestMapping("api/v1/tuition")
 @RestController
-public class TuitionClassController {
+public class TuitionClassController extends BaseController {
     private final TuitionClassService tuitionClassService;
 
     public TuitionClassController(TuitionClassService tuitionClassService) {
@@ -33,19 +31,14 @@ public class TuitionClassController {
      */
     @PostMapping("")
     public ResponseEntity<ResponseWrapper> createTuitionClass(@RequestBody TuitionClassRequestDto tuitionClassRequestDto) {
-        try {
-            if (!tuitionClassRequestDto.isRequiredAvailable()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            var tuitionClass = tuitionClassService.saveTuitionClass(tuitionClassRequestDto);
-            var responseDto = new TuitionClassResponseDto(tuitionClass);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.LOCATION_CREATED, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (TuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!tuitionClassRequestDto.isRequiredAvailable()) {
+            log.debug("The required fields {} are missing for create new tuition class", tuitionClassRequestDto.toJson());
+            return getErrorResponse(ErrorResponseStatus.MISSING_REQUIRED_FIELDS);
         }
+        var tuitionClass = tuitionClassService.saveTuitionClass(tuitionClassRequestDto);
+        var responseDto = new TuitionClassResponseDto(tuitionClass);
+        log.debug("The tuition class is created successfully");
+        return getSuccessResponse(SuccessResponseStatus.LOCATION_CREATED, responseDto, HttpStatus.CREATED);
     }
 
     /**
@@ -55,15 +48,10 @@ public class TuitionClassController {
      */
     @GetMapping("")
     public ResponseEntity<ResponseWrapper> getAllTuitionClasses() {
-        try {
-            var tuitionClassPage = tuitionClassService.getTuitionClassPage();
-            var responseDto = new TuitionClassListResponseDto(tuitionClassPage);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_LOCATION_LIST, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (TuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        var tuitionClassPage = tuitionClassService.getTuitionClassPage();
+        var responseDto = new TuitionClassListResponseDto(tuitionClassPage);
+        log.debug("Retrieving all tuition class details successfully");
+        return getSuccessResponse(SuccessResponseStatus.READ_LOCATION_LIST, responseDto, HttpStatus.OK);
     }
 
     /**
@@ -74,18 +62,10 @@ public class TuitionClassController {
      */
     @GetMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> getTuitionClassById(@PathVariable String tuitionClassId) {
-        try {
-            var tuitionClass = tuitionClassService.getTuitionClassById(tuitionClassId);
-            var responseDto = new TuitionClassResponseDto(tuitionClass);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.READ_LOCATION, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidTuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (TuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        var tuitionClass = tuitionClassService.getTuitionClassById(tuitionClassId);
+        var responseDto = new TuitionClassResponseDto(tuitionClass);
+        log.debug("Tuition class retrieved successfully for tuition class id: {}", tuitionClassId);
+        return getSuccessResponse(SuccessResponseStatus.READ_LOCATION, responseDto, HttpStatus.OK);
     }
 
     /**
@@ -96,22 +76,15 @@ public class TuitionClassController {
      */
     @PutMapping("")
     public ResponseEntity<ResponseWrapper> updateTuitionClass(@RequestBody UpdateTuitionClassRequestDto updateLocationRequestDto) {
-        try {
-            if (!updateLocationRequestDto.isRequiredAvailable()) {
-                var response = new ErrorResponseWrapper(ErrorResponseStatus.MISSING_REQUIRED_FIELDS, null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-            var tuitionClass = tuitionClassService.updateTuitionClass(updateLocationRequestDto);
-            var responseDto = new TuitionClassResponseDto(tuitionClass);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.LOCATION_UPDATED, responseDto);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidTuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (TuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (!updateLocationRequestDto.isRequiredAvailable()) {
+            log.debug("The required fields {} are missing for update tuition class id: {}",
+                    updateLocationRequestDto.toJson(), updateLocationRequestDto.getTuitionClassId());
+            return getErrorResponse(ErrorResponseStatus.MISSING_REQUIRED_FIELDS);
         }
+        var tuitionClass = tuitionClassService.updateTuitionClass(updateLocationRequestDto);
+        var responseDto = new TuitionClassResponseDto(tuitionClass);
+        log.debug("The tuition class is updated successfully for tuition class id: {}", updateLocationRequestDto.getTuitionClassId());
+        return getSuccessResponse(SuccessResponseStatus.LOCATION_UPDATED, responseDto, HttpStatus.OK);
     }
 
     /**
@@ -122,16 +95,8 @@ public class TuitionClassController {
      */
     @DeleteMapping("/{tuitionClassId}")
     public ResponseEntity<ResponseWrapper> deleteTuitionClass(@PathVariable String tuitionClassId) {
-        try {
-            tuitionClassService.deleteLocation(tuitionClassId);
-            var successResponse = new SuccessResponseWrapper(SuccessResponseStatus.LOCATION_DELETED, null);
-            return new ResponseEntity<>(successResponse, HttpStatus.OK);
-        } catch (InvalidTuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INVALID_LOCATION, null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } catch (TuitionClassException e) {
-            var response = new ErrorResponseWrapper(ErrorResponseStatus.INTERNAL_SERVER_ERROR, null);
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        tuitionClassService.deleteLocation(tuitionClassId);
+        log.debug("Tuition class is deleted successfully for tuition class id: {}", tuitionClassId);
+        return getSuccessResponse(SuccessResponseStatus.LOCATION_DELETED, null, HttpStatus.OK);
     }
 }

@@ -1,4 +1,3 @@
-
 server:
   port: 8105
   servlet:
@@ -7,11 +6,14 @@ server:
 spring:
   application:
     name: CMS-Class-Location
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
   datasource:
-    url: jdbc:mysql://bd3dabe003b1d4:d3f6ae8c@us-cdbr-east-06.cleardb.net/heroku_b2917d10e1448b0?reconnect=true
-#    username: root
-#    password: Dev@#$123
+    url: jdbc:mysql://localhost:3306/cms_tuition_class
+    username: root
+    password: Dev@#$123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -23,7 +25,7 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: https://cms-discovery.herokuapp.com/eureka
+      defaultZone: http://localhost:8761/eureka
   instance:
     preferIpAddress: true
 
